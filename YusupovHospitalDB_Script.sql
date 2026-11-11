@@ -379,3 +379,144 @@ USE [master]
 GO
 ALTER DATABASE [HospitalBD] SET  READ_WRITE
 GO
+
+USE [HospitalBD];
+GO
+SET XACT_ABORT ON;
+SET ANSI_NULLS ON;
+SET ANSI_PADDING ON;
+SET ANSI_WARNINGS ON;
+SET ARITHABORT ON;
+SET CONCAT_NULL_YIELDS_NULL ON;
+SET QUOTED_IDENTIFIER ON;
+SET NUMERIC_ROUNDABORT OFF;
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF COL_LENGTH(N'dbo.Patients', N'Паспорт') IS NULL
+        ALTER TABLE dbo.Patients ADD [Паспорт] nvarchar(11) NULL;
+    IF COL_LENGTH(N'dbo.Patients', N'Полис_ОМС') IS NULL
+        ALTER TABLE dbo.Patients ADD [Полис_ОМС] nvarchar(16) NULL;
+    IF COL_LENGTH(N'dbo.Patients', N'ИНН') IS NULL
+        ALTER TABLE dbo.Patients ADD [ИНН] nvarchar(12) NULL;
+    IF COL_LENGTH(N'dbo.Patients', N'СНИЛС') IS NULL
+        ALTER TABLE dbo.Patients ADD [СНИЛС] nvarchar(14) NULL;
+    IF COL_LENGTH(N'dbo.Patients', N'Телефон') IS NULL
+        ALTER TABLE dbo.Patients ADD [Телефон] nvarchar(18) NULL;
+
+    -- Only missing values are populated. Existing values are never overwritten.
+    -- All generated identifiers are fictional teaching examples, not verified documents.
+    EXEC sys.sp_executesql N'
+        IF EXISTS (SELECT 1 FROM dbo.Patients WHERE [Id_пациента] < 1 OR [Id_пациента] > 999999)
+            THROW 51001, N''Нужен отдельный набор учебных реквизитов для этих идентификаторов.'', 1;
+
+        UPDATE p SET
+            [Паспорт] = CASE WHEN NULLIF(LTRIM(RTRIM([Паспорт])), N'''') IS NULL
+                THEN N''0000 '' + n.SixDigits ELSE [Паспорт] END,
+            [Полис_ОМС] = CASE WHEN NULLIF(LTRIM(RTRIM([Полис_ОМС])), N'''') IS NULL
+                THEN N''0000000000'' + n.SixDigits ELSE [Полис_ОМС] END,
+            [ИНН] = CASE WHEN NULLIF(LTRIM(RTRIM([ИНН])), N'''') IS NULL
+                THEN N''000000'' + n.SixDigits ELSE [ИНН] END,
+            [СНИЛС] = CASE WHEN NULLIF(LTRIM(RTRIM([СНИЛС])), N'''') IS NULL
+                THEN N''000-'' + LEFT(n.SixDigits,3) + N''-'' + RIGHT(n.SixDigits,3) + N'' 00'' ELSE [СНИЛС] END,
+            [Телефон] = CASE WHEN NULLIF(LTRIM(RTRIM([Телефон])), N'''') IS NULL
+                THEN N''+7 (000) 0'' + LEFT(n.SixDigits,2) + N''-'' + SUBSTRING(n.SixDigits,3,2) + N''-'' + RIGHT(n.SixDigits,2) ELSE [Телефон] END
+        FROM dbo.Patients p
+        CROSS APPLY (SELECT RIGHT(N''000000'' + CONVERT(nvarchar(10),p.[Id_пациента]),6) AS SixDigits) n
+        WHERE NULLIF(LTRIM(RTRIM([Паспорт])),N'''') IS NULL
+           OR NULLIF(LTRIM(RTRIM([Полис_ОМС])),N'''') IS NULL
+           OR NULLIF(LTRIM(RTRIM([ИНН])),N'''') IS NULL
+           OR NULLIF(LTRIM(RTRIM([СНИЛС])),N'''') IS NULL
+           OR NULLIF(LTRIM(RTRIM([Телефон])),N'''') IS NULL;
+    ';
+
+    IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name=N'CHK_Patients_PassportFormat' AND parent_object_id=OBJECT_ID(N'dbo.Patients'))
+        EXEC(N'ALTER TABLE dbo.Patients WITH CHECK ADD CONSTRAINT CHK_Patients_PassportFormat CHECK ([Паспорт] IS NULL OR (LEN([Паспорт])=11 AND [Паспорт] LIKE N''[0-9][0-9][0-9][0-9] [0-9][0-9][0-9][0-9][0-9][0-9]''));');
+    IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name=N'CHK_Patients_OmsFormat' AND parent_object_id=OBJECT_ID(N'dbo.Patients'))
+        EXEC(N'ALTER TABLE dbo.Patients WITH CHECK ADD CONSTRAINT CHK_Patients_OmsFormat CHECK ([Полис_ОМС] IS NULL OR (LEN([Полис_ОМС])=16 AND [Полис_ОМС] NOT LIKE N''%[^0-9]%''));');
+    IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name=N'CHK_Patients_InnFormat' AND parent_object_id=OBJECT_ID(N'dbo.Patients'))
+        EXEC(N'ALTER TABLE dbo.Patients WITH CHECK ADD CONSTRAINT CHK_Patients_InnFormat CHECK ([ИНН] IS NULL OR (LEN([ИНН])=12 AND [ИНН] NOT LIKE N''%[^0-9]%''));');
+    IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name=N'CHK_Patients_SnilsFormat' AND parent_object_id=OBJECT_ID(N'dbo.Patients'))
+        EXEC(N'ALTER TABLE dbo.Patients WITH CHECK ADD CONSTRAINT CHK_Patients_SnilsFormat CHECK ([СНИЛС] IS NULL OR (LEN([СНИЛС])=14 AND [СНИЛС] LIKE N''[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9] [0-9][0-9]''));');
+    IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name=N'CHK_Patients_PhoneFormat' AND parent_object_id=OBJECT_ID(N'dbo.Patients'))
+        EXEC(N'ALTER TABLE dbo.Patients WITH CHECK ADD CONSTRAINT CHK_Patients_PhoneFormat CHECK ([Телефон] IS NULL OR (LEN([Телефон])=18 AND [Телефон] LIKE N''+7 ([0-9][0-9][0-9]) [0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]''));');
+
+    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id=OBJECT_ID(N'dbo.Patients') AND name=N'UX_Patients_Passport')
+        EXEC(N'CREATE UNIQUE INDEX UX_Patients_Passport ON dbo.Patients([Паспорт]) WHERE [Паспорт] IS NOT NULL;');
+    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id=OBJECT_ID(N'dbo.Patients') AND name=N'UX_Patients_Oms')
+        EXEC(N'CREATE UNIQUE INDEX UX_Patients_Oms ON dbo.Patients([Полис_ОМС]) WHERE [Полис_ОМС] IS NOT NULL;');
+    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id=OBJECT_ID(N'dbo.Patients') AND name=N'UX_Patients_Inn')
+        EXEC(N'CREATE UNIQUE INDEX UX_Patients_Inn ON dbo.Patients([ИНН]) WHERE [ИНН] IS NOT NULL;');
+    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id=OBJECT_ID(N'dbo.Patients') AND name=N'UX_Patients_Snils')
+        EXEC(N'CREATE UNIQUE INDEX UX_Patients_Snils ON dbo.Patients([СНИЛС]) WHERE [СНИЛС] IS NOT NULL;');
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
+GO
+
+-- Synthetic teaching data, not real persons' documents or contacts.
+-- Replaces only the previous all-zero demo fields for the original patients 1..25.
+USE [HospitalBD];
+GO
+SET XACT_ABORT ON;
+SET ANSI_NULLS ON;
+SET ANSI_PADDING ON;
+SET ANSI_WARNINGS ON;
+SET ARITHABORT ON;
+SET CONCAT_NULL_YIELDS_NULL ON;
+SET QUOTED_IDENTIFIER ON;
+SET NUMERIC_ROUNDABORT OFF;
+BEGIN TRY
+    BEGIN TRANSACTION;
+    DECLARE @seed TABLE (Id int PRIMARY KEY, Passport nvarchar(11), Policy nvarchar(16), Inn nvarchar(12), Snils nvarchar(14), Phone nvarchar(18));
+    INSERT @seed (Id,Passport,Policy,Inn,Snils,Phone) VALUES
+        (1, N'8005 723112', N'0295284242311875', N'027497446734', N'747-352-221 04', N'+7 (917) 489-36-21'),
+        (2, N'8010 572929', N'0238215495501425', N'027470957690', N'169-189-998 53', N'+7 (937) 352-98-12'),
+        (3, N'8023 310960', N'0292903584838300', N'027412658161', N'444-311-739 58', N'+7 (937) 978-34-94'),
+        (4, N'8015 407248', N'0298788105261922', N'027510961166', N'444-761-031 78', N'+7 (917) 897-23-17'),
+        (5, N'8002 437423', N'0203892055223858', N'027887457121', N'456-477-164 22', N'+7 (917) 804-86-53'),
+        (6, N'8008 308593', N'0294345479253205', N'027445184559', N'528-982-010 19', N'+7 (937) 388-06-91'),
+        (7, N'8020 989888', N'0237510030452510', N'027443512525', N'728-952-348 45', N'+7 (927) 644-11-11'),
+        (8, N'8012 627707', N'0232542661775389', N'027880589351', N'749-539-298 69', N'+7 (927) 732-77-57'),
+        (9, N'8025 787742', N'0200684927688619', N'027576148089', N'217-171-591 53', N'+7 (917) 653-85-08'),
+        (10, N'8007 671932', N'0220754822722773', N'027820967190', N'804-908-541 08', N'+7 (937) 575-22-21'),
+        (11, N'8013 105949', N'0242982673185717', N'027498314530', N'390-502-496 72', N'+7 (937) 680-74-96'),
+        (12, N'8004 359746', N'0289573467221914', N'027699855401', N'412-261-123 13', N'+7 (927) 911-60-88'),
+        (13, N'8011 792982', N'0211521568844262', N'027877395613', N'343-647-681 98', N'+7 (927) 374-90-66'),
+        (14, N'8006 607530', N'0252708944267682', N'027535324634', N'168-743-751 17', N'+7 (927) 418-56-69'),
+        (15, N'8024 777015', N'0237898998249043', N'027457893912', N'642-813-198 93', N'+7 (937) 556-69-71'),
+        (16, N'8014 498294', N'0275000791286500', N'027596941183', N'659-942-192 60', N'+7 (917) 211-15-36'),
+        (17, N'8003 574369', N'0225516438874713', N'027824024510', N'977-849-819 22', N'+7 (927) 445-72-99'),
+        (18, N'8016 858342', N'0261225692145933', N'027557931329', N'853-405-264 98', N'+7 (917) 220-88-62'),
+        (19, N'8026 155793', N'0275651038698237', N'027442602840', N'277-909-851 46', N'+7 (937) 846-38-63'),
+        (20, N'8009 651115', N'0267899026527105', N'027617070684', N'795-661-769 80', N'+7 (937) 682-45-13'),
+        (21, N'8015 267663', N'0237895220448632', N'027837461411', N'990-661-484 53', N'+7 (927) 962-90-87'),
+        (22, N'8020 659738', N'0215759878681022', N'027679289162', N'214-647-275 62', N'+7 (917) 616-71-91'),
+        (23, N'8008 370546', N'0210238209815749', N'027634321610', N'294-939-852 57', N'+7 (917) 848-02-73'),
+        (24, N'8012 316839', N'0276587081860434', N'027465361140', N'201-342-468 02', N'+7 (917) 444-03-10'),
+        (25, N'8025 885082', N'0241522134330647', N'027637797661', N'975-243-813 43', N'+7 (937) 931-50-33');
+
+    -- Abort if these fields were edited after preparation. Re-running the migration is allowed.
+    IF EXISTS (
+        SELECT 1 FROM @seed s JOIN dbo.Patients p ON p.[Id_пациента]=s.Id
+        CROSS APPLY (SELECT RIGHT(N'000000'+CONVERT(nvarchar(10),s.Id),6) AS n) old
+        WHERE NOT (ISNULL(p.[Паспорт],N'')=N'0000 '+old.n AND ISNULL(p.[Полис_ОМС],N'')=N'0000000000'+old.n
+            AND ISNULL(p.[ИНН],N'')=N'000000'+old.n AND ISNULL(p.[СНИЛС],N'')=N'000-'+LEFT(old.n,3)+N'-'+RIGHT(old.n,3)+N' 00'
+            AND ISNULL(p.[Телефон],N'')=N'+7 (000) 0'+LEFT(old.n,2)+N'-'+SUBSTRING(old.n,3,2)+N'-'+RIGHT(old.n,2))
+          AND NOT (ISNULL(p.[Паспорт],N'')=s.Passport AND ISNULL(p.[Полис_ОМС],N'')=s.Policy AND ISNULL(p.[ИНН],N'')=s.Inn AND ISNULL(p.[СНИЛС],N'')=s.Snils AND ISNULL(p.[Телефон],N'')=s.Phone)
+    ) THROW 51002, N'Реквизиты изменены после подготовки: проверь их перед заменой учебных данных.', 1;
+
+    UPDATE p SET [Паспорт]=s.Passport,[Полис_ОМС]=s.Policy,[ИНН]=s.Inn,[СНИЛС]=s.Snils,[Телефон]=s.Phone
+    FROM dbo.Patients p JOIN @seed s ON p.[Id_пациента]=s.Id
+    WHERE ISNULL(p.[Паспорт],N'')<>s.Passport OR ISNULL(p.[Полис_ОМС],N'')<>s.Policy OR ISNULL(p.[ИНН],N'')<>s.Inn OR ISNULL(p.[СНИЛС],N'')<>s.Snils OR ISNULL(p.[Телефон],N'')<>s.Phone;
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT>0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
+GO
