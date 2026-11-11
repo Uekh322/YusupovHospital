@@ -55,6 +55,11 @@
           <Property Name="Адрес" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="Город" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="Пол" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="Паспорт" Type="nvarchar" MaxLength="11" Nullable="true" />
+          <Property Name="Полис_ОМС" Type="nvarchar" MaxLength="16" Nullable="true" />
+          <Property Name="ИНН" Type="nvarchar" MaxLength="12" Nullable="true" />
+          <Property Name="СНИЛС" Type="nvarchar" MaxLength="14" Nullable="true" />
+          <Property Name="Телефон" Type="nvarchar" MaxLength="18" Nullable="true" />
         </EntityType>
         <EntityType Name="TreatmentSheets">
           <Key>
@@ -218,6 +223,11 @@
           <Property Name="Адрес" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Город" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Пол" Type="String" MaxLength="1" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="Паспорт" Type="String" MaxLength="11" Nullable="true" FixedLength="false" Unicode="true" />
+          <Property Name="Полис_ОМС" Type="String" MaxLength="16" Nullable="true" FixedLength="false" Unicode="true" />
+          <Property Name="ИНН" Type="String" MaxLength="12" Nullable="true" FixedLength="false" Unicode="true" />
+          <Property Name="СНИЛС" Type="String" MaxLength="14" Nullable="true" FixedLength="false" Unicode="true" />
+          <Property Name="Телефон" Type="String" MaxLength="18" Nullable="true" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="MedicalHistories" Relationship="Self.FK_MedicalHistories_Patients" FromRole="Patients" ToRole="MedicalHistories" />
         </EntityType>
         <EntityType Name="TreatmentSheets">
@@ -378,6 +388,11 @@
                 <ScalarProperty Name="Адрес" ColumnName="Адрес" />
                 <ScalarProperty Name="Город" ColumnName="Город" />
                 <ScalarProperty Name="Пол" ColumnName="Пол" />
+                <ScalarProperty Name="Паспорт" ColumnName="Паспорт" />
+                <ScalarProperty Name="Полис_ОМС" ColumnName="Полис_ОМС" />
+                <ScalarProperty Name="ИНН" ColumnName="ИНН" />
+                <ScalarProperty Name="СНИЛС" ColumnName="СНИЛС" />
+                <ScalarProperty Name="Телефон" ColumnName="Телефон" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

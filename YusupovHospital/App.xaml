@@ -1,9 +1,18 @@
-﻿<Application x:Class="YusupovHospital.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:YusupovHospital"
-             StartupUri="MainWindow.xaml">
-    <Application.Resources>
-         
-    </Application.Resources>
+﻿<Application x:Class="YusupovHospital.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" StartupUri="MainWindow.xaml">
+ <Application.Resources>
+  <SolidColorBrush x:Key="Accent" Color="#9364CA"/>
+  <Style TargetType="Window"><Setter Property="FontFamily" Value="Century Gothic, Segoe UI"/><Setter Property="FontSize" Value="15"/><Setter Property="Background" Value="#F4F4F7"/><Setter Property="Foreground" Value="#242034"/></Style>
+  <Style TargetType="Page"><Setter Property="FontFamily" Value="Century Gothic, Segoe UI"/><Setter Property="FontSize" Value="15"/><Setter Property="Background" Value="#F4F4F7"/></Style>
+  <Style TargetType="Button"><Setter Property="Margin" Value="5"/><Setter Property="Padding" Value="15,8"/><Setter Property="MinHeight" Value="36"/><Setter Property="Background" Value="{StaticResource Accent}"/><Setter Property="Foreground" Value="White"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Cursor" Value="Hand"/><Style.Triggers><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger></Style.Triggers></Style>
+  <Style x:Key="Quiet" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Background" Value="#E6DEEF"/><Setter Property="Foreground" Value="#423158"/></Style>
+  <Style TargetType="TextBox"><Setter Property="Padding" Value="8,6"/><Setter Property="Margin" Value="0,4,0,10"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style>
+  <Style TargetType="ComboBox"><Setter Property="Padding" Value="7,6"/><Setter Property="MinHeight" Value="34"/><Setter Property="Margin" Value="0,4,12,10"/></Style>
+  <Style TargetType="DatePicker"><Setter Property="Margin" Value="0,4,0,10"/><Setter Property="MinHeight" Value="34"/></Style>
+  <Style TargetType="ListViewItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0,0,0,10"/></Style>
+  <Style TargetType="DataGrid"><Setter Property="IsReadOnly" Value="True"/><Setter Property="AutoGenerateColumns" Value="False"/><Setter Property="CanUserAddRows" Value="False"/><Setter Property="RowHeight" Value="36"/><Setter Property="GridLinesVisibility" Value="Horizontal"/><Setter Property="HeadersVisibility" Value="Column"/></Style>
+  <DrawingImage x:Key="PatientPlaceholder"><DrawingImage.Drawing><DrawingGroup>
+   <GeometryDrawing Brush="#EAE2F4" Geometry="M0,0 H120 V120 H0 Z"/>
+   <GeometryDrawing Brush="#AD91CA" Geometry="M60,22 A20,20 0 1 1 59.9,22 M22,108 C22,65 98,65 98,108 Z"/>
+  </DrawingGroup></DrawingImage.Drawing></DrawingImage>
+ </Application.Resources>
 </Application>

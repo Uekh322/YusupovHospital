@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -35,8 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="EntityFramework" Version="6.2.0" />
-    <PackageReference Include="EntityFramework.ru" Version="6.2.0" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
@@ -151,4 +149,4 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-</Project>
+<ItemGroup><PackageReference Include="EntityFramework" Version="6.5.2" /><Reference Include="System.Configuration" /><Reference Include="System.ComponentModel.DataAnnotations" /></ItemGroup><ItemGroup><Compile Include="Infrastructure\HospitalSession.cs" /><Compile Include="Infrastructure\Manager.cs" /><Compile Include="Infrastructure\PatientService.cs" /><Compile Include="Infrastructure\PatientSupport.cs" /><Page Include="Pages\LoginPage.xaml"><Generator>MSBuild:Compile</Generator></Page><Compile Include="Pages\LoginPage.xaml.cs"><DependentUpon>LoginPage.xaml</DependentUpon></Compile><Page Include="Pages\MedicalPage.xaml"><Generator>MSBuild:Compile</Generator></Page><Compile Include="Pages\MedicalPage.xaml.cs"><DependentUpon>MedicalPage.xaml</DependentUpon></Compile><Page Include="Pages\PatientEditPage.xaml"><Generator>MSBuild:Compile</Generator></Page><Compile Include="Pages\PatientEditPage.xaml.cs"><DependentUpon>PatientEditPage.xaml</DependentUpon></Compile><Page Include="Pages\PatientsPage.xaml"><Generator>MSBuild:Compile</Generator></Page><Compile Include="Pages\PatientsPage.xaml.cs"><DependentUpon>PatientsPage.xaml</DependentUpon></Compile><Page Include="Pages\ReferencesPage.xaml"><Generator>MSBuild:Compile</Generator></Page><Compile Include="Pages\ReferencesPage.xaml.cs"><DependentUpon>ReferencesPage.xaml</DependentUpon></Compile></ItemGroup></Project>

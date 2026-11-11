@@ -4,15 +4,6 @@ CREATE DATABASE [HospitalBD]
 GO
 USE [HospitalBD]
 GO
-/****** Объект:  User [Registrar_User]    Дата создания скрипта: 13.10.2026 18:05:49 ******/
-CREATE USER [Registrar_User] WITHOUT LOGIN WITH DEFAULT_SCHEMA=[dbo]
-GO
-/****** Объект:  User [Doctor_User]    Дата создания скрипта: 13.10.2026 18:05:49 ******/
-CREATE USER [Doctor_User] WITHOUT LOGIN WITH DEFAULT_SCHEMA=[dbo]
-GO
-/****** Объект:  User [ChiefDoctor_User]    Дата создания скрипта: 13.10.2026 18:05:49 ******/
-CREATE USER [ChiefDoctor_User] WITHOUT LOGIN WITH DEFAULT_SCHEMA=[dbo]
-GO
 /****** Объект:  DatabaseRole [RegistrarRole]    Дата создания скрипта: 13.10.2026 18:05:49 ******/
 CREATE ROLE [RegistrarRole]
 GO
@@ -21,12 +12,6 @@ CREATE ROLE [DoctorRole]
 GO
 /****** Объект:  DatabaseRole [ChiefDoctorRole]    Дата создания скрипта: 13.10.2026 18:05:49 ******/
 CREATE ROLE [ChiefDoctorRole]
-GO
-ALTER ROLE [RegistrarRole] ADD MEMBER [Registrar_User]
-GO
-ALTER ROLE [DoctorRole] ADD MEMBER [Doctor_User]
-GO
-ALTER ROLE [ChiefDoctorRole] ADD MEMBER [ChiefDoctor_User]
 GO
 /****** Объект:  Table [dbo].[Departments]    Дата создания скрипта: 13.10.2026 18:05:50 ******/
 SET ANSI_NULLS ON
@@ -519,4 +504,19 @@ BEGIN CATCH
     IF @@TRANCOUNT>0 ROLLBACK TRANSACTION;
     THROW;
 END CATCH;
+GO
+
+USE [HospitalBD];
+GO
+GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::[dbo] TO [ChiefDoctorRole];
+GRANT SELECT ON OBJECT::[dbo].[Doctors] TO [DoctorRole];
+GRANT SELECT ON OBJECT::[dbo].[Patients] TO [DoctorRole];
+GRANT SELECT, INSERT, UPDATE ON OBJECT::[dbo].[MedicalHistories] TO [DoctorRole];
+GRANT SELECT, INSERT, UPDATE ON OBJECT::[dbo].[TreatmentSheets] TO [DoctorRole];
+DENY INSERT, UPDATE, DELETE ON OBJECT::[dbo].[Departments] TO [DoctorRole];
+GRANT SELECT ON OBJECT::[dbo].[Departments] TO [RegistrarRole];
+GRANT SELECT ON OBJECT::[dbo].[Doctors] TO [RegistrarRole];
+GRANT SELECT, INSERT, UPDATE ON OBJECT::[dbo].[Patients] TO [RegistrarRole];
+DENY SELECT, INSERT, UPDATE, DELETE ON OBJECT::[dbo].[MedicalHistories] TO [RegistrarRole];
+DENY SELECT, INSERT, UPDATE, DELETE ON OBJECT::[dbo].[TreatmentSheets] TO [RegistrarRole];
 GO
