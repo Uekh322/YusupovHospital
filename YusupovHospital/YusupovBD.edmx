@@ -1,0 +1,420 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="Хранилище HospitalBDModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Departments">
+          <Key>
+            <PropertyRef Name="Id_отделения" />
+          </Key>
+          <Property Name="Id_отделения" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Название" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Этаж" Type="int" Nullable="false" />
+          <Property Name="Номера_комнат" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Id_заведующего" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Doctors">
+          <Key>
+            <PropertyRef Name="Id_врача" />
+          </Key>
+          <Property Name="Id_врача" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Фамилия" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Имя" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Отчество" Type="nvarchar" MaxLength="100" />
+          <Property Name="Должность" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Дата_начала_работы" Type="date" Nullable="false" />
+          <Property Name="Стаж" Type="int" StoreGeneratedPattern="Computed" />
+          <Property Name="Научное_звание" Type="nvarchar" MaxLength="100" />
+          <Property Name="Адрес" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Id_отделения" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="MedicalHistories">
+          <Key>
+            <PropertyRef Name="Id_истории" />
+          </Key>
+          <Property Name="Id_истории" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Id_пациента" Type="int" Nullable="false" />
+          <Property Name="Id_врача" Type="int" Nullable="false" />
+          <Property Name="Диагноз" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="Дата_заболевания" Type="date" Nullable="false" />
+          <Property Name="Дата_вылечивания" Type="date" />
+          <Property Name="Вид_лечения" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Patients">
+          <Key>
+            <PropertyRef Name="Id_пациента" />
+          </Key>
+          <Property Name="Id_пациента" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Фамилия" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Имя" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Отчество" Type="nvarchar" MaxLength="100" />
+          <Property Name="Дата_рождения" Type="date" Nullable="false" />
+          <Property Name="Возраст" Type="int" StoreGeneratedPattern="Computed" />
+          <Property Name="Адрес" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Город" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Пол" Type="char" MaxLength="1" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TreatmentSheets">
+          <Key>
+            <PropertyRef Name="Id_записи" />
+          </Key>
+          <Property Name="Id_записи" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Id_истории" Type="int" Nullable="false" />
+          <Property Name="Дата_лечения" Type="date" Nullable="false" />
+          <Property Name="Лекарства" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="Температура" Type="decimal" Precision="3" Scale="1" Nullable="false" />
+          <Property Name="Давление" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Состояние" Type="nvarchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Departments_Doctors_Head">
+          <End Role="Doctors" Type="Self.Doctors" Multiplicity="1" />
+          <End Role="Departments" Type="Self.Departments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctors">
+              <PropertyRef Name="Id_врача" />
+            </Principal>
+            <Dependent Role="Departments">
+              <PropertyRef Name="Id_заведующего" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Doctors_Departments">
+          <End Role="Departments" Type="Self.Departments" Multiplicity="1" />
+          <End Role="Doctors" Type="Self.Doctors" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Departments">
+              <PropertyRef Name="Id_отделения" />
+            </Principal>
+            <Dependent Role="Doctors">
+              <PropertyRef Name="Id_отделения" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MedicalHistories_Doctors">
+          <End Role="Doctors" Type="Self.Doctors" Multiplicity="1" />
+          <End Role="MedicalHistories" Type="Self.MedicalHistories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctors">
+              <PropertyRef Name="Id_врача" />
+            </Principal>
+            <Dependent Role="MedicalHistories">
+              <PropertyRef Name="Id_врача" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MedicalHistories_Patients">
+          <End Role="Patients" Type="Self.Patients" Multiplicity="1" />
+          <End Role="MedicalHistories" Type="Self.MedicalHistories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patients">
+              <PropertyRef Name="Id_пациента" />
+            </Principal>
+            <Dependent Role="MedicalHistories">
+              <PropertyRef Name="Id_пациента" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TreatmentSheets_MedicalHistories">
+          <End Role="MedicalHistories" Type="Self.MedicalHistories" Multiplicity="1" />
+          <End Role="TreatmentSheets" Type="Self.TreatmentSheets" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MedicalHistories">
+              <PropertyRef Name="Id_истории" />
+            </Principal>
+            <Dependent Role="TreatmentSheets">
+              <PropertyRef Name="Id_истории" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Хранилище HospitalBDModelContainer">
+          <EntitySet Name="Departments" EntityType="Self.Departments" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Doctors" EntityType="Self.Doctors" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MedicalHistories" EntityType="Self.MedicalHistories" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Patients" EntityType="Self.Patients" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TreatmentSheets" EntityType="Self.TreatmentSheets" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Departments_Doctors_Head" Association="Self.FK_Departments_Doctors_Head">
+            <End Role="Doctors" EntitySet="Doctors" />
+            <End Role="Departments" EntitySet="Departments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Doctors_Departments" Association="Self.FK_Doctors_Departments">
+            <End Role="Departments" EntitySet="Departments" />
+            <End Role="Doctors" EntitySet="Doctors" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MedicalHistories_Doctors" Association="Self.FK_MedicalHistories_Doctors">
+            <End Role="Doctors" EntitySet="Doctors" />
+            <End Role="MedicalHistories" EntitySet="MedicalHistories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MedicalHistories_Patients" Association="Self.FK_MedicalHistories_Patients">
+            <End Role="Patients" EntitySet="Patients" />
+            <End Role="MedicalHistories" EntitySet="MedicalHistories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TreatmentSheets_MedicalHistories" Association="Self.FK_TreatmentSheets_MedicalHistories">
+            <End Role="MedicalHistories" EntitySet="MedicalHistories" />
+            <End Role="TreatmentSheets" EntitySet="TreatmentSheets" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="HospitalBDModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Departments">
+          <Key>
+            <PropertyRef Name="Id_отделения" />
+          </Key>
+          <Property Name="Id_отделения" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Название" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Этаж" Type="Int32" Nullable="false" />
+          <Property Name="Номера_комнат" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Id_заведующего" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Doctors" Relationship="Self.FK_Departments_Doctors_Head" FromRole="Departments" ToRole="Doctors" />
+          <NavigationProperty Name="Doctors1" Relationship="Self.FK_Doctors_Departments" FromRole="Departments" ToRole="Doctors" />
+        </EntityType>
+        <EntityType Name="Doctors">
+          <Key>
+            <PropertyRef Name="Id_врача" />
+          </Key>
+          <Property Name="Id_врача" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Фамилия" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Имя" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Отчество" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Должность" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Дата_начала_работы" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Стаж" Type="Int32" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="Научное_звание" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Адрес" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Id_отделения" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Departments" Relationship="Self.FK_Departments_Doctors_Head" FromRole="Doctors" ToRole="Departments" />
+          <NavigationProperty Name="Departments1" Relationship="Self.FK_Doctors_Departments" FromRole="Doctors" ToRole="Departments" />
+          <NavigationProperty Name="MedicalHistories" Relationship="Self.FK_MedicalHistories_Doctors" FromRole="Doctors" ToRole="MedicalHistories" />
+        </EntityType>
+        <EntityType Name="MedicalHistories">
+          <Key>
+            <PropertyRef Name="Id_истории" />
+          </Key>
+          <Property Name="Id_истории" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id_пациента" Type="Int32" Nullable="false" />
+          <Property Name="Id_врача" Type="Int32" Nullable="false" />
+          <Property Name="Диагноз" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Дата_заболевания" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Дата_вылечивания" Type="DateTime" Precision="0" />
+          <Property Name="Вид_лечения" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Doctors" Relationship="Self.FK_MedicalHistories_Doctors" FromRole="MedicalHistories" ToRole="Doctors" />
+          <NavigationProperty Name="Patients" Relationship="Self.FK_MedicalHistories_Patients" FromRole="MedicalHistories" ToRole="Patients" />
+          <NavigationProperty Name="TreatmentSheets" Relationship="Self.FK_TreatmentSheets_MedicalHistories" FromRole="MedicalHistories" ToRole="TreatmentSheets" />
+        </EntityType>
+        <EntityType Name="Patients">
+          <Key>
+            <PropertyRef Name="Id_пациента" />
+          </Key>
+          <Property Name="Id_пациента" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Фамилия" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Имя" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Отчество" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Дата_рождения" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Возраст" Type="Int32" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="Адрес" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Город" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Пол" Type="String" MaxLength="1" FixedLength="true" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="MedicalHistories" Relationship="Self.FK_MedicalHistories_Patients" FromRole="Patients" ToRole="MedicalHistories" />
+        </EntityType>
+        <EntityType Name="TreatmentSheets">
+          <Key>
+            <PropertyRef Name="Id_записи" />
+          </Key>
+          <Property Name="Id_записи" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id_истории" Type="Int32" Nullable="false" />
+          <Property Name="Дата_лечения" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Лекарства" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Температура" Type="Decimal" Precision="3" Scale="1" Nullable="false" />
+          <Property Name="Давление" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Состояние" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="MedicalHistories" Relationship="Self.FK_TreatmentSheets_MedicalHistories" FromRole="TreatmentSheets" ToRole="MedicalHistories" />
+        </EntityType>
+        <Association Name="FK_Departments_Doctors_Head">
+          <End Role="Doctors" Type="Self.Doctors" Multiplicity="1" />
+          <End Role="Departments" Type="Self.Departments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctors">
+              <PropertyRef Name="Id_врача" />
+            </Principal>
+            <Dependent Role="Departments">
+              <PropertyRef Name="Id_заведующего" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Doctors_Departments">
+          <End Role="Departments" Type="Self.Departments" Multiplicity="1" />
+          <End Role="Doctors" Type="Self.Doctors" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Departments">
+              <PropertyRef Name="Id_отделения" />
+            </Principal>
+            <Dependent Role="Doctors">
+              <PropertyRef Name="Id_отделения" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MedicalHistories_Doctors">
+          <End Role="Doctors" Type="Self.Doctors" Multiplicity="1" />
+          <End Role="MedicalHistories" Type="Self.MedicalHistories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctors">
+              <PropertyRef Name="Id_врача" />
+            </Principal>
+            <Dependent Role="MedicalHistories">
+              <PropertyRef Name="Id_врача" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MedicalHistories_Patients">
+          <End Role="Patients" Type="Self.Patients" Multiplicity="1" />
+          <End Role="MedicalHistories" Type="Self.MedicalHistories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patients">
+              <PropertyRef Name="Id_пациента" />
+            </Principal>
+            <Dependent Role="MedicalHistories">
+              <PropertyRef Name="Id_пациента" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TreatmentSheets_MedicalHistories">
+          <End Role="MedicalHistories" Type="Self.MedicalHistories" Multiplicity="1" />
+          <End Role="TreatmentSheets" Type="Self.TreatmentSheets" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MedicalHistories">
+              <PropertyRef Name="Id_истории" />
+            </Principal>
+            <Dependent Role="TreatmentSheets">
+              <PropertyRef Name="Id_истории" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="HospitalBDEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Departments" EntityType="Self.Departments" />
+          <EntitySet Name="Doctors" EntityType="Self.Doctors" />
+          <EntitySet Name="MedicalHistories" EntityType="Self.MedicalHistories" />
+          <EntitySet Name="Patients" EntityType="Self.Patients" />
+          <EntitySet Name="TreatmentSheets" EntityType="Self.TreatmentSheets" />
+          <AssociationSet Name="FK_Departments_Doctors_Head" Association="Self.FK_Departments_Doctors_Head">
+            <End Role="Doctors" EntitySet="Doctors" />
+            <End Role="Departments" EntitySet="Departments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Doctors_Departments" Association="Self.FK_Doctors_Departments">
+            <End Role="Departments" EntitySet="Departments" />
+            <End Role="Doctors" EntitySet="Doctors" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MedicalHistories_Doctors" Association="Self.FK_MedicalHistories_Doctors">
+            <End Role="Doctors" EntitySet="Doctors" />
+            <End Role="MedicalHistories" EntitySet="MedicalHistories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MedicalHistories_Patients" Association="Self.FK_MedicalHistories_Patients">
+            <End Role="Patients" EntitySet="Patients" />
+            <End Role="MedicalHistories" EntitySet="MedicalHistories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TreatmentSheets_MedicalHistories" Association="Self.FK_TreatmentSheets_MedicalHistories">
+            <End Role="MedicalHistories" EntitySet="MedicalHistories" />
+            <End Role="TreatmentSheets" EntitySet="TreatmentSheets" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Хранилище HospitalBDModelContainer" CdmEntityContainer="HospitalBDEntities">
+          <EntitySetMapping Name="Departments">
+            <EntityTypeMapping TypeName="HospitalBDModel.Departments">
+              <MappingFragment StoreEntitySet="Departments">
+                <ScalarProperty Name="Id_отделения" ColumnName="Id_отделения" />
+                <ScalarProperty Name="Название" ColumnName="Название" />
+                <ScalarProperty Name="Этаж" ColumnName="Этаж" />
+                <ScalarProperty Name="Номера_комнат" ColumnName="Номера_комнат" />
+                <ScalarProperty Name="Id_заведующего" ColumnName="Id_заведующего" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Doctors">
+            <EntityTypeMapping TypeName="HospitalBDModel.Doctors">
+              <MappingFragment StoreEntitySet="Doctors">
+                <ScalarProperty Name="Id_врача" ColumnName="Id_врача" />
+                <ScalarProperty Name="Фамилия" ColumnName="Фамилия" />
+                <ScalarProperty Name="Имя" ColumnName="Имя" />
+                <ScalarProperty Name="Отчество" ColumnName="Отчество" />
+                <ScalarProperty Name="Должность" ColumnName="Должность" />
+                <ScalarProperty Name="Дата_начала_работы" ColumnName="Дата_начала_работы" />
+                <ScalarProperty Name="Стаж" ColumnName="Стаж" />
+                <ScalarProperty Name="Научное_звание" ColumnName="Научное_звание" />
+                <ScalarProperty Name="Адрес" ColumnName="Адрес" />
+                <ScalarProperty Name="Id_отделения" ColumnName="Id_отделения" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MedicalHistories">
+            <EntityTypeMapping TypeName="HospitalBDModel.MedicalHistories">
+              <MappingFragment StoreEntitySet="MedicalHistories">
+                <ScalarProperty Name="Id_истории" ColumnName="Id_истории" />
+                <ScalarProperty Name="Id_пациента" ColumnName="Id_пациента" />
+                <ScalarProperty Name="Id_врача" ColumnName="Id_врача" />
+                <ScalarProperty Name="Диагноз" ColumnName="Диагноз" />
+                <ScalarProperty Name="Дата_заболевания" ColumnName="Дата_заболевания" />
+                <ScalarProperty Name="Дата_вылечивания" ColumnName="Дата_вылечивания" />
+                <ScalarProperty Name="Вид_лечения" ColumnName="Вид_лечения" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Patients">
+            <EntityTypeMapping TypeName="HospitalBDModel.Patients">
+              <MappingFragment StoreEntitySet="Patients">
+                <ScalarProperty Name="Id_пациента" ColumnName="Id_пациента" />
+                <ScalarProperty Name="Фамилия" ColumnName="Фамилия" />
+                <ScalarProperty Name="Имя" ColumnName="Имя" />
+                <ScalarProperty Name="Отчество" ColumnName="Отчество" />
+                <ScalarProperty Name="Дата_рождения" ColumnName="Дата_рождения" />
+                <ScalarProperty Name="Возраст" ColumnName="Возраст" />
+                <ScalarProperty Name="Адрес" ColumnName="Адрес" />
+                <ScalarProperty Name="Город" ColumnName="Город" />
+                <ScalarProperty Name="Пол" ColumnName="Пол" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TreatmentSheets">
+            <EntityTypeMapping TypeName="HospitalBDModel.TreatmentSheets">
+              <MappingFragment StoreEntitySet="TreatmentSheets">
+                <ScalarProperty Name="Id_записи" ColumnName="Id_записи" />
+                <ScalarProperty Name="Id_истории" ColumnName="Id_истории" />
+                <ScalarProperty Name="Дата_лечения" ColumnName="Дата_лечения" />
+                <ScalarProperty Name="Лекарства" ColumnName="Лекарства" />
+                <ScalarProperty Name="Температура" ColumnName="Температура" />
+                <ScalarProperty Name="Давление" ColumnName="Давление" />
+                <ScalarProperty Name="Состояние" ColumnName="Состояние" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
